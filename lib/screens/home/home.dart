@@ -6,7 +6,6 @@ import 'dart:async';
 import 'components/sos_button.dart';
 import 'components/contacts_section.dart';
 import 'components/safety_features.dart';
-import 'components/safety_timer.dart';
 import 'services/location_service.dart';
 
 class HomePage extends StatefulWidget {
