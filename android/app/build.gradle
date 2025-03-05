@@ -7,14 +7,14 @@ plugins {
 
 android {
     namespace = "com.jason.fyp_app"
-    compileSdk 34 // Use modern syntax
+    compileSdk 35 // Use modern syntax
 
     ndkVersion = flutter.ndkVersion
 
     defaultConfig {
         applicationId "com.jason.fyp_app"
         minSdk 23
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0.0"
     }

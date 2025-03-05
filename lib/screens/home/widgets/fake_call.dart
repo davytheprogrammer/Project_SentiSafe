@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,6 +31,7 @@ class _FakeCallScreenState extends State<FakeCallScreen>
   final Random _random = Random();
   List<String> _emergencyContacts = [];
   int _countdownValue = 0;
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -73,7 +74,8 @@ class _FakeCallScreenState extends State<FakeCallScreen>
     _bounceController.dispose();
     _callTimer?.cancel();
     _durationTimer?.cancel();
-    FlutterRingtonePlayer().stop();
+    _audioPlayer.stop();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -208,12 +210,9 @@ class _FakeCallScreenState extends State<FakeCallScreen>
       HapticFeedback.vibrate();
     });
 
-    // Play ringtone
-    await FlutterRingtonePlayer().play(
-      fromAsset: 'assets/audio/custom_ringtone.mp3',
-      looping: true,
-      volume: 1.0,
-    );
+    // Play ringtone using audioplayers
+    await _audioPlayer.play(AssetSource('audio/custom_ringtone.mp3'));
+    _audioPlayer.setReleaseMode(ReleaseMode.loop); // Loop the ringtone
 
     showDialog(
       context: context,
@@ -372,6 +371,8 @@ class _FakeCallScreenState extends State<FakeCallScreen>
                           backgroundColor: _isSpeakerOn ? Colors.white24 : Colors.white10,
                           onPressed: () {
                             setState(() => _isSpeakerOn = !_isSpeakerOn);
+                            // Set volume based on speaker state
+                            _audioPlayer.setVolume(_isSpeakerOn ? 1.0 : 0.5);
                           },
                           label: 'Speaker',
                         ),
@@ -391,7 +392,7 @@ class _FakeCallScreenState extends State<FakeCallScreen>
                           backgroundColor: Colors.white30,
                           label: 'Message',
                           onPressed: () {
-                            FlutterRingtonePlayer().stop();
+                            _audioPlayer.stop();
                             Navigator.of(context).pop();
                             setState(() {
                               _isIncomingCall = false;
@@ -404,7 +405,7 @@ class _FakeCallScreenState extends State<FakeCallScreen>
                           backgroundColor: Colors.red,
                           label: 'Decline',
                           onPressed: () {
-                            FlutterRingtonePlayer().stop();
+                            _audioPlayer.stop();
                             Navigator.of(context).pop();
                             setState(() {
                               _isIncomingCall = false;
@@ -417,7 +418,7 @@ class _FakeCallScreenState extends State<FakeCallScreen>
                           backgroundColor: Colors.green,
                           label: 'Accept',
                           onPressed: () {
-                            FlutterRingtonePlayer().stop();
+                            _audioPlayer.stop();
                             _bounceController.stop();
                             setState(() {
                               _isCallActive = true;
